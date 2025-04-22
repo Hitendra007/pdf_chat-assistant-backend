@@ -1,0 +1,37 @@
+from langchain_qdrant import QdrantVectorStore
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from app.core.settings import settings
+import os
+from qdrant_client import QdrantClient
+
+embedder = GoogleGenerativeAIEmbeddings(
+    model="models/text-embedding-004",
+    google_api_key=settings.GEMINI_API_KEY
+)
+
+VECTOR_COLLECTION_NAME = "chat_pdf"
+QDRANT_URL = settings.QDRANT_URL
+client = QdrantClient(url=QDRANT_URL)
+
+# Check if collection exists and create if necessary
+if VECTOR_COLLECTION_NAME not in [c.name for c in client.get_collections().collections]:
+    client.recreate_collection(
+        collection_name=VECTOR_COLLECTION_NAME,
+        vectors_config={
+            "size": 768, 
+            "distance": "Cosine"  
+        },
+    )
+
+def upsert_pdf_embeddings(chunks=[], pdf_hash: str=""):
+    for i, chunk in enumerate(chunks):
+        chunk.metadata["pdf_id"] = pdf_hash
+
+    vector_store = QdrantVectorStore.from_documents(
+        documents=chunks,
+        collection_name=VECTOR_COLLECTION_NAME,
+        url=QDRANT_URL,
+        embedding=embedder
+    )
+
+    print(f"Embeddings saved to Qdrant. for pdf_id:{pdf_hash}")

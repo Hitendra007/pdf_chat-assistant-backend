@@ -1,0 +1,51 @@
+# === Python / FastAPI (inside backend/) ===
+backend/__pycache__/
+backend/**/*.py[cod]
+backend/.mypy_cache/
+backend/.pytest_cache/
+backend/.vscode/
+backend/.idea/
+backend/*.db
+backend/*.sqlite3
+backend/staticfiles/
+backend/media/
+backend/typings/
+backend/*.log
+
+# === Virtual environment ===
+venv/
+.venv/
+.env
+.env.*
+
+# === Node.js (for frontend or scripts) ===
+node_modules/
+*.log
+
+# === Docker ===
+**/__pycache__/
+docker-compose.override.yml
+
+# === Editor settings ===
+.vscode/
+.idea/
+*.swp
+*~
+
+# === OS files ===
+.DS_Store
+Thumbs.db
+
+# === Misc ===
+*.egg-info/
+dist/
+build/
+*.bak
+
+
+# === Ignore project-level files ===
+docker-compose.yml
+init.sql
+package.json
+package-lock.json
+tes.js

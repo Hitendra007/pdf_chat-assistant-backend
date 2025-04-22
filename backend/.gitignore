@@ -1,0 +1,88 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environment
+venv/
+env/
+.venv/
+.env/
+.env.*
+
+# Pipenv
+Pipfile.lock
+
+# Poetry
+poetry.lock
+
+# Pyright / Pylance
+typings/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+
+# Mypy
+.mypy_cache/
+.dmypy.json
+
+# Pytest
+.pytest_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Logs
+*.log
+
+# SQLite database
+*.sqlite3
+*.db
+
+# FastAPI static/media dirs (if used)
+staticfiles/
+media/
+
+# Test artifacts
+test-results/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# MacOS
+.DS_Store
+
+# Node (if using for frontend)
+node_modules/
+
+# Docker
+**/__pycache__/
+docker-compose.override.yml
+
+# Editor backups
+*~
+
+node_modules
+init.sql
+package.json
+pack-loc.json
+tes.js
