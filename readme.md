@@ -1,3 +1,4 @@
+[![Watch the demo](https://img.youtube.com/vi/ac40lf2G8Yo/0.jpg)](https://youtu.be/ac40lf2G8Yo)
 # 📄 Chat with PDF AI Assistant
 
 An intelligent document assistant that allows users to **chat with PDFs**. Upload your document, ask questions, and get context-aware answers powered by Large Language Models, vector embeddings, and real-time interaction.
