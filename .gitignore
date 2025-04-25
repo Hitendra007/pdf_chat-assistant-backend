@@ -44,7 +44,6 @@ build/
 
 
 # === Ignore project-level files ===
-docker-compose.yml
 init.sql
 package.json
 package-lock.json
