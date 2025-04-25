@@ -23,7 +23,6 @@ class PDFMeta(Base):
     name = Column(String)
     hash = Column(String, unique=True)
 
-    # Relationship to ChatSession (pdf_id in ChatSession is a foreign key to PDFMeta)
     chat_sessions = relationship("ChatSession", back_populates="pdf")
 
 
@@ -33,7 +32,6 @@ class ChatSession(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     pdf_id = Column(UUID(as_uuid=True), ForeignKey("pdf_meta.id"))
 
-    # Relationship to PDFMeta
     pdf = relationship("PDFMeta", back_populates="chat_sessions")
 
 

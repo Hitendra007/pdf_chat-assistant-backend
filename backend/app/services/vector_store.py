@@ -13,7 +13,6 @@ VECTOR_COLLECTION_NAME = "chat_pdf"
 QDRANT_URL = settings.QDRANT_URL
 client = QdrantClient(url=QDRANT_URL)
 
-# Check if collection exists and create if necessary
 if VECTOR_COLLECTION_NAME not in [c.name for c in client.get_collections().collections]:
     client.recreate_collection(
         collection_name=VECTOR_COLLECTION_NAME,

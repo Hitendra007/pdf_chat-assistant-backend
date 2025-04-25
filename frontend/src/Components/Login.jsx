@@ -1,34 +1,45 @@
-import React, { useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-
 const Login = () => {
-
-    const { login } = useAuth()
-    const  navigate  = useNavigate()
+    const { login } = useAuth();
+    const navigate = useNavigate();
+    
+    // State for storing error message
+    const [errorMessage, setErrorMessage] = useState(null);
 
     const HandleLogin = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
         const email = e.target.email.value;
         const password = e.target.password.value;
-        console.log(email, password,"----login----")
+        console.log(email, password);
+
         try {
-            await login(email, password)
-            navigate("/home")
-            console.log("Login Successfull !!")
+            await login(email, password);
+            console.log("Login Successful !!");
+            navigate("/home");
         } catch (error) {
-            console.log("Login Failed!!", error)
+            console.log("Login Failed!!", error);
+            setErrorMessage("Login failed. Please check your credentials.");
+            
+            // Remove error message after 5 seconds
+            setTimeout(() => {
+                setErrorMessage(null);
+            }, 5000);
         }
-    }
-
-
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
             <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-lg">
                 <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Login to ChatDoc AI</h2>
+
+                {/* Show error message if it exists */}
+                {errorMessage && (
+                    <div className="text-red-500 text-center mb-4">{errorMessage}</div>
+                )}
 
                 <form className="space-y-5" onSubmit={HandleLogin}>
                     <div>

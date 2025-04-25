@@ -12,12 +12,21 @@ const WelcomePage = () => {
         <p className="text-lg text-gray-600 mb-8 max-w-xl">
           Upload any PDF and start a conversation. Get instant answers, insights, and summaries from your documents with our advanced AI assistant.
         </p>
-        <Link
-          to="/signup"
-          className="bg-blue-600 text-white px-6 py-3 rounded text-lg hover:bg-blue-700"
-        >
-          Get Started Free
-        </Link>
+        <div className="flex flex-col md:flex-row gap-4 justify-center items-center mx-2 my-4">
+          <Link
+            to="/new-chat"
+            className="bg-blue-600 text-white px-6 py-3 rounded text-lg hover:bg-blue-700 transition duration-200"
+          >
+            Start New Chat
+          </Link>
+          <Link
+            to="/home"
+            className="bg-blue-600 text-white px-6 py-3 rounded text-lg hover:bg-blue-700 transition duration-200"
+          >
+            Your Chats
+          </Link>
+        </div>
+
         <div className="mt-4">
           <Link to="/login" className="text-blue-500 hover:underline">
             Already have an account? Login

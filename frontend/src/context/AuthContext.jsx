@@ -38,7 +38,8 @@ export const AuthProvider = ({ children }) => {
                 setToken(response.data.accesstoken);
             }
         } catch (err) {
-            console.log(err);
+            console.log(err,"fdsfsdfdsf");
+            throw err
         }
     };
 
@@ -56,6 +57,7 @@ export const AuthProvider = ({ children }) => {
             }
         } catch (err) {
             console.log("Error during signup: ", err);
+            throw err;
         }
     };
 

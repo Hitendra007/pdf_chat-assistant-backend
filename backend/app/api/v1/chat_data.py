@@ -11,7 +11,6 @@ router = APIRouter()
 
 @router.get("/get_chat_session", dependencies=[Depends(auth_middleware)])
 async def getChats(request: Request, response: Response):
-    print("______________________+++++++++++++++++++++++++++++++")
     async with SessionLocal() as db:
         result = await db.execute(
             select(ChatSession)
@@ -33,11 +32,10 @@ async def get_history(request: Request, response: Response, session_id: str):
     SELECT * FROM chat_messages 
     WHERE session_id = :s_id 
     ORDER BY created_at ASC 
-    LIMIT 50
+    LIMIT 100
 """)
         result = await db.execute(query, {
             "s_id": session_id,
-            # "time": datetime.now() - timedelta(hours=24)
         })
         messages = result.fetchall()
 

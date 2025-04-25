@@ -5,7 +5,6 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from app.core.settings import settings
 
-# ─── password hashing setup ───────────────────────────────
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def get_password_hash(password: str) -> str:
@@ -14,7 +13,6 @@ def get_password_hash(password: str) -> str:
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
-# ─── JWT creation / verification ──────────────────────────
 def create_token(data: dict, expires_delta: timedelta) -> str:
     to_encode = data.copy()
     expire = datetime.now() + expires_delta

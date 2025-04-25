@@ -15,29 +15,26 @@ active_connections: Dict[str, WebSocket] = {}
 @router.websocket("/ws/chat/{pdf_id}")
 async def chat_ws(websocket: WebSocket, pdf_id: str):
     await websocket.accept()
-    print("🔌 WebSocket connected")
+    print("🔌WebSocket connected")
 
-    # Extract and verify token
     token = websocket.cookies.get('access_token')
-    print("🔐 Parsed cookie token:", token)
     if not token:
-        print("❌ No token in cookies → closing")
+        print("No token in cookies → closing")
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 
     token_data = verify_token(token)
     user_id = token_data.get("sub") if token_data else None
     if not user_id:
-        print("❌ Invalid token → closing")
+        print("Invalid token → closing")
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 
-    # Receive init payload once
     try:
         init_payload = await websocket.receive_json()
-        print("📥 Received init payload:", init_payload)
+        print("Received init payload:", init_payload)
     except Exception as e:
-        print("❌ Error while receiving init payload:", e)
+        print("Error while receiving init payload:", e)
         await websocket.close(code=status.WS_1003_UNSUPPORTED_DATA)
         return
 
@@ -45,7 +42,6 @@ async def chat_ws(websocket: WebSocket, pdf_id: str):
     is_legal_doc = init_payload.get("is_legal_doc")
     active_connections[session_id] = websocket
 
-    # Upsert ChatSession record
     async with SessionLocal() as db:
         session_uuid = UUID(session_id)
         result = await db.execute(
@@ -61,10 +57,8 @@ async def chat_ws(websocket: WebSocket, pdf_id: str):
             db.add(chat_session)
             await db.commit()
 
-    # Initialize chat history with system prompt
     chat_history = [{ 'role': 'system', 'content': system_prompt }]
 
-    # Main loop: receive questions and stream responses
     try:
         while True:
             data = await websocket.receive_json()
@@ -128,5 +122,5 @@ async def chat_ws(websocket: WebSocket, pdf_id: str):
         print(f"Disconnected: {session_id}")
 
     except Exception as e:
-        print(f"❌ WebSocket error: {e}")
+        print(f"WebSocket error: {e}")
         await websocket.close()

@@ -55,12 +55,7 @@ function Home() {
               <div style={styles.cardBody}>
                 <p style={styles.text}><strong>Session ID:</strong> {session.id}</p>
                 <p style={styles.text}><strong>PDF ID:</strong> {session.pdf.id}</p>
-                <p style={styles.text}>
-                  <strong>Created At:</strong>{' '}
-                  {session.created_at
-                    ? new Date(session.created_at).toLocaleString()
-                    : 'N/A'}
-                </p>
+                
               </div>
             </div>
           </div>
