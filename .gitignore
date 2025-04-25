@@ -16,7 +16,7 @@ backend/*.log
 venv/
 .venv/
 .env
-.env.*
+
 
 # === Node.js (for frontend or scripts) ===
 node_modules/
