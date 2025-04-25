@@ -1,0 +1,53 @@
+# === NODE.JS / REACT (Frontend) ===
+node_modules/
+dist/
+build/
+.vite/
+.env
+.env.*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Vite cache
+.cache/
+*.local
+
+# === PYTHON / FASTAPI (Backend) ===
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+pip-wheel-metadata/
+*.pyd
+
+# Virtualenv
+venv/
+env/
+ENV/
+.venv/
+.python-version
+
+# FastAPI specific
+instance/
+*.db
+*.sqlite3
+
+# VS Code settings
+.vscode/
+
+# MacOS/Linux/Windows system files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Pyright / MyPy / IDE cache
+.mypy_cache/
+.pyright/
+.idea/

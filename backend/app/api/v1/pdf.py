@@ -1,4 +1,4 @@
-from fastapi import APIRouter, File, UploadFile, Form, HTTPException,Depends
+from fastapi import APIRouter, File, UploadFile, Form, HTTPException,Depends,Request
 from app.services.pdf_processor import process_pdf
 from app.services.vector_store import upsert_pdf_embeddings
 from app.db.models import PDFMeta
@@ -11,11 +11,16 @@ from app.middleware.AuthMiddleware import auth_middleware
 
 router = APIRouter()
 
-@router.post("/upload",dependencies=[Depends(auth_middleware)])
-async def upload_pdf(file: UploadFile = File(...), user_id: str = Form(...)):
+
+
+
+@router.post("/upload", dependencies=[Depends(auth_middleware)])
+async def upload_pdf(file: UploadFile = File(...), request: Request = None):
+    user_id = request.state.user_id  # populated by your AuthMiddleware
+
     content = await file.read()
     try:
-        decoded = content.decode("latin1")  # works for most PDFs
+        decoded = content.decode("latin1")
     except Exception:
         raise HTTPException(status_code=400, detail="Unable to decode PDF file")
 
@@ -25,9 +30,9 @@ async def upload_pdf(file: UploadFile = File(...), user_id: str = Form(...)):
         existing = await db.execute(
             select(PDFMeta).where(PDFMeta.hash == hash_, PDFMeta.user_id == user_id)
         )
-        if existing.scalar_one_or_none():
-            apiresponse = ApiResponse(200,'Pdf already exists',{"hash":hash_})
-            return {"message": "PDF already exists for this user", "hash": hash_}
+        existing_pdf = existing.scalar_one_or_none()
+        if existing_pdf:
+            return ApiResponse(200, "PDF already exists", {"pdf":existing_pdf}).to_dict()
 
         chunks = process_pdf(content)
         upsert_pdf_embeddings(chunks, hash_)
@@ -35,5 +40,6 @@ async def upload_pdf(file: UploadFile = File(...), user_id: str = Form(...)):
         pdf = PDFMeta(id=uuid4(), user_id=user_id, name=file.filename, hash=hash_)
         db.add(pdf)
         await db.commit()
+        
 
-        return {"message": "PDF uploaded and embedded", "hash": hash_}
+        return ApiResponse(200, "PDF uploaded and embedded", {"pdf":pdf}).to_dict()

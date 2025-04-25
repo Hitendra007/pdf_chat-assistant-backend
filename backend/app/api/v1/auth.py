@@ -1,10 +1,9 @@
-# app/api/v1/auth.py
-
-from fastapi import APIRouter, HTTPException, Response, status, Request,Depends
+from fastapi import APIRouter, HTTPException, Response, status, Request, Depends
 from datetime import timedelta
 from sqlalchemy import select
 from uuid import uuid4
 from app.middleware.AuthMiddleware import auth_middleware
+from pydantic import BaseModel, EmailStr
 
 from app.core.security import (
     get_password_hash,
@@ -19,12 +18,20 @@ from app.utils.apiResponse import ApiResponse
 
 router = APIRouter()
 
+# Pydantic models for request bodies
+class UserRegister(BaseModel):
+    email: EmailStr
+    password: str
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-async def register(email: str, password: str):
+async def register(payload: UserRegister):
     async with SessionLocal() as db:
         result = await db.execute(
-            select(models.User).where(models.User.email == email)
+            select(models.User).where(models.User.email == payload.email)
         )
         if result.scalar_one_or_none():
             raise HTTPException(
@@ -34,24 +41,23 @@ async def register(email: str, password: str):
 
         user = models.User(
             id=uuid4(),
-            email=email,
-            password=get_password_hash(password)
+            email=payload.email,
+            password=get_password_hash(payload.password)
         )
         db.add(user)
         await db.commit()
 
         return {"message": "User registered successfully"}
 
-
 @router.post("/login")
-async def login(response: Response, email: str, password: str):
+async def login(response: Response, payload: UserLogin):
     async with SessionLocal() as db:
         result = await db.execute(
-            select(models.User).where(models.User.email == email)
+            select(models.User).where(models.User.email == payload.email)
         )
         user = result.scalar_one_or_none()
 
-        if not user or not verify_password(password, user.password):
+        if not user or not verify_password(payload.password, user.password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid credentials"
@@ -78,9 +84,8 @@ async def login(response: Response, email: str, password: str):
     return ApiResponse(
         status.HTTP_200_OK,
         "Logged in successfully",
-        data={"user_id": str(user.id), "email": user.email,"access_token":access_token}
+        data={"user_id": str(user.id), "email": user.email, "access_token": access_token}
     ).to_dict()
-
 
 @router.post("/refresh")
 async def refresh_token(request: Request, response: Response):
@@ -106,12 +111,17 @@ async def refresh_token(request: Request, response: Response):
         "Access token refreshed"
     ).to_dict()
 
-
-@router.post("/logout",dependencies=[Depends(auth_middleware)])
+@router.get("/logout", dependencies=[Depends(auth_middleware)])
 async def logout(response: Response):
+    print("hi i am here ")
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
     return ApiResponse(
         status.HTTP_200_OK,
         "Logged out successfully"
     ).to_dict()
+
+@router.get("/authStatus",dependencies=[Depends(auth_middleware)])
+async def checkAuthStatus(request:Request,response:Response):
+    return ApiResponse(200,"User authenticated successfully",{"authenticated":True,"user":request.state.user_id})
+
