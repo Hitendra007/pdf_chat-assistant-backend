@@ -28,7 +28,6 @@ const ChatPage = () => {
       sId = uuidv4();
       localStorage.setItem('current_session_id', sId);
     }
-    // Assume you set pdf_hash/pdf_name in a previous step — adjust as needed.
     if (!pHash) {
       // fallback to pdfId as hash if nothing else
       pHash = pdfId;

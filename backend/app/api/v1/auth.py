@@ -18,7 +18,6 @@ from app.utils.apiResponse import ApiResponse
 
 router = APIRouter()
 
-# Pydantic models for request bodies
 class UserRegister(BaseModel):
     email: EmailStr
     password: str
