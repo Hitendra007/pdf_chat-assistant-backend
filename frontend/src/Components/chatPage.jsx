@@ -4,7 +4,8 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { v4 as uuidv4 } from 'uuid';
-
+import { API_BASE_URL } from '../api/Auth';
+import { websocket_url } from '../api/Auth';
 const ChatPage = () => {
   const { pdfId } = useParams();
   const [sessionId, setSessionId] = useState(null);
@@ -51,7 +52,7 @@ const ChatPage = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `https://pdf-chat-assistant-backend.onrender.com/api/v1/chat_data/chat_history`,
+        `${API_BASE_URL}/chat_data/chat_history`,
         {
           params: { session_id: sId },
           withCredentials: true,
@@ -72,7 +73,7 @@ const ChatPage = () => {
 
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const ws = new WebSocket(
-      `${protocol}://localhost:8000/api/v1/chat/ws/chat/${pdfId}`
+      `${protocol}://${websocket_url}/api/v1/chat/ws/chat/${pdfId}`
     );
     wsRef.current = ws;
 

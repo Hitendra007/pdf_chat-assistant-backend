@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
+import { API_BASE_URL } from '../api/Auth';
 function NewChat() {
   const [pdfFile, setPdfFile] = useState(null);
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ function NewChat() {
 
     try {
       const res = await axios.post(
-        'https://pdf-chat-assistant-backend.onrender.com/api/v1/pdf/upload',
+        `${API_BASE_URL}/pdf/upload`,
         formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' },
