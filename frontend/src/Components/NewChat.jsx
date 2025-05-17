@@ -22,7 +22,7 @@ function NewChat() {
 
     try {
       const res = await axios.post(
-        'http://localhost:8000/api/v1/pdf/upload',
+        'https://pdf-chat-assistant-backend.onrender.com/api/v1/pdf/upload',
         formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' },

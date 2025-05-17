@@ -51,7 +51,7 @@ const ChatPage = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `http://localhost:8000/api/v1/chat_data/chat_history`,
+        `https://pdf-chat-assistant-backend.onrender.com/api/v1/chat_data/chat_history`,
         {
           params: { session_id: sId },
           withCredentials: true,
