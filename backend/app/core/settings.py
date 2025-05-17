@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE: int = 1
     REFRESH_TOKEN_EXPIRE: int = 2
     QDRANT_URL: str
+    QDRANT_API_KEY: str
     GEMINI_API_KEY: str
 
     class Config:

@@ -11,7 +11,8 @@ embedder = GoogleGenerativeAIEmbeddings(
 
 VECTOR_COLLECTION_NAME = "chat_pdf"
 QDRANT_URL = settings.QDRANT_URL
-client = QdrantClient(url=QDRANT_URL)
+QDRANT_API_KEY = settings.QDRANT_API_KEY
+client = QdrantClient(url=QDRANT_URL,api_key=QDRANT_API_KEY)
 
 if VECTOR_COLLECTION_NAME not in [c.name for c in client.get_collections().collections]:
     client.recreate_collection(
@@ -25,11 +26,12 @@ if VECTOR_COLLECTION_NAME not in [c.name for c in client.get_collections().colle
 def upsert_pdf_embeddings(chunks=[], pdf_hash: str=""):
     for i, chunk in enumerate(chunks):
         chunk.metadata["pdf_id"] = pdf_hash
-
+    print(pdf_hash,"-------------------------------------------")
     vector_store = QdrantVectorStore.from_documents(
         documents=chunks,
         collection_name=VECTOR_COLLECTION_NAME,
         url=QDRANT_URL,
+        api_key=QDRANT_API_KEY,
         embedding=embedder
     )
 
