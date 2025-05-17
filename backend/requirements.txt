@@ -70,7 +70,7 @@ propcache==0.3.1
 proto-plus==1.26.1
 protobuf==5.29.4
 py_rust_stemmers==0.1.5
-pyasn1==0.6.1
+# pyasn1==0.6.1
 pyasn1_modules==0.4.2
 pydantic==2.11.3
 pydantic-settings==2.9.1
@@ -80,6 +80,7 @@ pyreadline3==3.5.4
 python-dotenv==1.1.0
 python-jose==3.4.0
 python-multipart==0.0.20
+# pywin32==310
 PyYAML==6.0.2
 qdrant-client==1.13.3
 requests==2.32.3
