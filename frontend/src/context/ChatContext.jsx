@@ -11,7 +11,7 @@ export const ChatProvider = ({ children }) => {
     const get_sessions = async () => {
         try {
             const response = await get_chat_sessions();
-            console.log("Chat sessions:", response);
+            // console.log("Chat sessions:", response);
             setChatSessions(response.data.data.chat_sessions);
         } catch (error) {
             console.error("Can't fetch sessions", error);

@@ -79,6 +79,7 @@ const ChatPage = () => {
 
     ws.onopen = () => {
       // send init payload
+      
       ws.send(
         JSON.stringify({ session_id: sessionId, is_legal_doc: false })
       );
