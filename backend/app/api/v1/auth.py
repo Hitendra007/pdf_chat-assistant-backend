@@ -73,11 +73,11 @@ async def login(response: Response, payload: UserLogin):
 
     response.set_cookie(
         "access_token", access_token,
-        httponly=True, secure=True, samesite="Lax"
+        httponly=True, secure=True, samesite="none"
     )
     response.set_cookie(
         "refresh_token", refresh_token,
-        httponly=True, secure=True, samesite="Lax"
+        httponly=True, secure=True, samesite="none"
     )
 
     return ApiResponse(
