@@ -45,6 +45,5 @@ build/
 
 # === Ignore project-level files ===
 init.sql
-package.json
-package-lock.json
+
 tes.js
