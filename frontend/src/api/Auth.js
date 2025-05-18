@@ -1,7 +1,8 @@
 import axios from 'axios';
 // const API_BASE_URL = 'http://localhost:8000/api/v1';
-const API_BASE_URL = 'https://pdf-chat-assistant-backend.onrender.com/api/v1'
-const websocket_url = 'pdf-chat-assistant-backend.onrender.com'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const websocket_url = import.meta.env.VITE_WEBSOCKET_URL;
+
 const apiclient = axios.create({
     baseURL:API_BASE_URL,
     headers:{

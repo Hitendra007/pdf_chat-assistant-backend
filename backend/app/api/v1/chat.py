@@ -2,15 +2,43 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect, status
 from app.services.fetch_docs import relevent_chunks
 from app.db.session import SessionLocal
 from app.db.models import ChatMessage, ChatSession
+from app.core.settings import settings
 from datetime import datetime
 from sqlalchemy import select
 from uuid import uuid4, UUID
 from typing import Dict
 from app.core.security import verify_token
 from app.services.llm_bot import client, system_prompt
+import asyncio
 
 router = APIRouter()
 active_connections: Dict[str, WebSocket] = {}
+
+requests_times = []
+RATE_LIMIT = settings.RATE_LIMIT
+TIME_WINDOW = settings.TIME_WINDOW_SECONDS
+
+def can_send():
+    now = datetime.now()
+    
+    req_count_in_window = [t for t in requests_times if (now-t).total_seconds() < TIME_WINDOW]
+    
+    if len(req_count_in_window) >= RATE_LIMIT:
+        return False
+    
+    requests_times.append(now)
+    return True
+
+def is_with_in_time_limits(timestamp):
+    return (datetime.now() - timestamp).total_seconds() < TIME_WINDOW
+
+async def cleanup_request_times():
+    global requests_times
+    while True:
+        await asyncio.sleep(5)
+        requests_times = list(filter(is_with_in_time_limits,requests_times))
+    
+
 
 @router.websocket("/ws/chat/{pdf_id}")
 async def chat_ws(websocket: WebSocket, pdf_id: str):
@@ -73,13 +101,17 @@ async def chat_ws(websocket: WebSocket, pdf_id: str):
             relevant_data = relevent_chunks(query=question, pdf_id=pdf_hash)
             context = " ".join([doc['text'] for doc in relevant_data])
 
-            # Append user message to history
             chat_history.append({
                 'role': 'user',
                 'content': f"{question}\n\nContext:\n{context}"
             })
-
-            # Stream LLM completion
+            
+            if not can_send():
+                await websocket.send_text("As it is free tier,⚠️ Rate limit exceeded: Too many user requests, please wait a minute.")
+                await websocket.send_text("__END__")
+                continue
+            
+            
             stream = client.chat.completions.create(
                 model="gemini-2.0-flash",
                 messages=chat_history,

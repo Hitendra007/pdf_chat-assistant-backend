@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     QDRANT_URL: str
     QDRANT_API_KEY: str
     GEMINI_API_KEY: str
+    RATE_LIMIT: int = 15
+    TIME_WINDOW_SECONDS: int = 60
 
     class Config:
         env_file = ".env"
