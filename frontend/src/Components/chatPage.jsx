@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import { v4 as uuidv4 } from 'uuid';
 import { API_BASE_URL } from '../api/Auth';
 import { websocket_url } from '../api/Auth';
+import { use } from 'react';
 const ChatPage = () => {
   const { pdfId } = useParams();
   const [sessionId, setSessionId] = useState(null);
@@ -17,8 +18,8 @@ const ChatPage = () => {
   const [loading, setLoading] = useState(true);
 
   const wsRef = useRef(null);
-
-  // 1️⃣ Initialize sessionId, pdfHash, pdfName
+  const chatboxRef = useRef(null)
+  //  Initialize sessionId, pdfHash, pdfName
   useEffect(() => {
     let sId = localStorage.getItem('current_session_id');
     let pHash = localStorage.getItem('pdf_hash');
@@ -47,7 +48,7 @@ const ChatPage = () => {
     fetchChatHistory(sId);
   }, [pdfId]);
 
-  // 2️⃣ Fetch chat history
+  //  Fetch chat history
   const fetchChatHistory = async (sId) => {
     try {
       setLoading(true);
@@ -114,7 +115,14 @@ const ChatPage = () => {
     return () => ws.close();
   }, [sessionId, loading, pdfId]);
 
-  // 4️⃣ Send a message
+  useEffect(()=>{
+       if(chatboxRef.current){
+          chatboxRef.current.scrollTop = chatboxRef.current.scrollHeight;
+       }
+  },[messages])
+
+
+  // Send a message
   const sendMessage = () => {
     if (!input.trim() || !wsRef.current) return;
     // push user message immediately
@@ -138,7 +146,7 @@ const ChatPage = () => {
     <div style={styles.container}>
       <h1 style={styles.title}>Chat with: {pdfName}</h1>
 
-      <div style={styles.chatBox}>
+      <div style={styles.chatBox} ref={chatboxRef}>
         {loading ? (
           <p>Loading chat history…</p>
         ) : messages.length === 0 ? (
