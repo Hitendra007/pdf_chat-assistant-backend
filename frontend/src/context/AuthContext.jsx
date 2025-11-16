@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect, createContext, useRef } from "react";
-import { signup as apiSignup, login as apiLogin, logout as apiLogout, checkAuthStatus } from "../api/Auth.js";
+import { signup as apiSignup, login as apiLogin, logout as apiLogout, checkAuthStatus, healthCheck } from "../api/Auth.js";
 
 const AuthContext = createContext();
 
@@ -95,6 +95,22 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         checkAuth();
         // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Keep backend alive by pinging it every 30 seconds (for Render.com)
+    useEffect(() => {
+        // Initial health check
+        healthCheck();
+
+        // Set up interval to ping backend every 30 seconds
+        const healthCheckInterval = setInterval(() => {
+            healthCheck();
+        }, 30000); // 30 seconds
+
+        // Cleanup interval on unmount
+        return () => {
+            clearInterval(healthCheckInterval);
+        };
     }, []);
 
     return (
