@@ -83,11 +83,9 @@ pydantic-settings==2.9.1
 pydantic_core==2.41.5
 PyJWT==2.10.1
 pypdf==5.4.0
-pyreadline3==3.5.4
 python-dotenv==1.1.0
 python-jose==3.4.0
 python-multipart==0.0.20
-pywin32==311
 PyYAML==6.0.2
 qdrant-client==1.15.1
 realtime==2.24.0
@@ -113,6 +111,5 @@ typing_extensions==4.15.0
 urllib3==2.4.0
 uvicorn==0.34.2
 websockets==15.0.1
-win32_setctime==1.2.0
 yarl==1.22.0
 zstandard==0.23.0
