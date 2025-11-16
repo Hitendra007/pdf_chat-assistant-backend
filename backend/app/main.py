@@ -7,6 +7,7 @@ from app.db.session import create_tables,lifespan
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
+    await create_tables()
     task = asyncio.create_task(chat.cleanup_request_times())
     yield
     task.cancel()
