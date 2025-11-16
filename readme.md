@@ -159,6 +159,6 @@ We welcome contributions! Feel free to:
 
 ## 💡 Acknowledgements
 
-Built with ❤️ using FastAPI, Qdrant, React, and OpenAI technologies.
+Built with ❤️ using FastAPI, Qdrant, React, and OpenAI technologies
 
 
