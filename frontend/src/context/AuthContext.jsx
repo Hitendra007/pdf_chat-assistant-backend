@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, createContext } from "react";
+import React, { useState, useContext, useEffect, createContext, useRef } from "react";
 import { signup as apiSignup, login as apiLogin, logout as apiLogout, checkAuthStatus } from "../api/Auth.js";
 
 const AuthContext = createContext();
@@ -8,22 +8,36 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [token, setToken] = useState('');
+    const checkingAuthRef = useRef(false);
     
     const checkAuth = async () => {
+        // Prevent multiple simultaneous auth checks
+        if (checkingAuthRef.current) {
+            return;
+        }
+        
         try {
+            checkingAuthRef.current = true;
             const response = await checkAuthStatus();
             if (response.status === 200) {
-                setUser(response.data.data.user);
-                setIsAuthenticated(true);
+                // AuthStatus response structure: response.data.data = {authenticated: true, user: {id, email}}
+                const userData = response.data.data?.user;
+                if (userData) {
+                    setUser(userData);
+                    setIsAuthenticated(true);
+                }
             }
         } catch (err) {
             if (err.response && err.response.status === 401) {
-                console.log("User not authenticated. Please login.");
+                // User not authenticated - this is expected for logged out users
+                setIsAuthenticated(false);
+                setUser(null);
             } else {
                 console.error("Auth check failed:", err);
             }
         } finally {
             setLoading(false);
+            checkingAuthRef.current = false;
         }
     };
     
@@ -31,27 +45,27 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         try {
             const response = await apiLogin(email, password);
-            console.log(response)
             if (response.status === 200) {
-                setUser(response.data.data.user);
+                // Login response structure: response.data.data = {user_id, email, access_token}
+                // Create user object from the response
+                const userData = {
+                    id: response.data.data.user_id,
+                    email: response.data.data.email
+                };
+                setUser(userData);
                 setIsAuthenticated(true);
-                setToken(response.data.accesstoken);
+                setToken(response.data.data.access_token);
             }
         } catch (err) {
-            console.log(err,"fdsfsdfdsf");
-            throw err
+            throw err;
         }
     };
 
     const signup = async (email, password) => {
         try {
-            const response = await apiSignup( email, password);
-            console.log(response);
+            const response = await apiSignup(email, password);
             if (response.status === 201) {
-                // setUser(response.data.user);
-                // setIsAuthenticated(true);
-                // setToken(response.data.accesstoken);
-                console.log('successfull signup')
+                console.log('Successful signup');
             } else {
                 console.log("Signup failed: ", response.status);
             }
@@ -63,7 +77,6 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            console.log(token,"sklfjsdfjsldfjsdl")
             const response = await apiLogout();
             if (response.status === 200) {
                 setUser(null);
@@ -72,11 +85,16 @@ export const AuthProvider = ({ children }) => {
             }
         } catch (err) {
             console.log(err);
+            // Even if logout fails, clear local state
+            setUser(null);
+            setIsAuthenticated(false);
+            setToken('');
         }
     };
 
     useEffect(() => {
         checkAuth();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

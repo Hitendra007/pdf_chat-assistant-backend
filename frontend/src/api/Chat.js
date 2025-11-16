@@ -1,14 +1,13 @@
 import axios from 'axios';
-// const API_BASE_URL = 'http://localhost:8000/api/v1';
-const API_BASE_URL = 'https://pdf-chat-assistant-backend.onrender.com/api/v1'
-// const API_BASE_URL = 'https://merntodoapplication-g6d6.onrender.com/api/v1'
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const apiclient = axios.create({
-    baseURL:API_BASE_URL,
-    headers:{
-        "Content-Type":"application/json"
+    baseURL: API_BASE_URL,
+    headers: {
+        "Content-Type": "application/json"
     },
-    withCredentials:true
+    withCredentials: true
 });
 
 

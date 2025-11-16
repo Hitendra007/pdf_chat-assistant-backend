@@ -122,5 +122,27 @@ async def logout(response: Response):
 
 @router.get("/authStatus",dependencies=[Depends(auth_middleware)])
 async def checkAuthStatus(request:Request,response:Response):
-    return ApiResponse(200,"User authenticated successfully",{"authenticated":True,"user":request.state.user_id})
+    async with SessionLocal() as db:
+        result = await db.execute(
+            select(models.User).where(models.User.id == request.state.user_id)
+        )
+        user = result.scalar_one_or_none()
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        return ApiResponse(
+            200,
+            "User authenticated successfully",
+            {
+                "authenticated": True,
+                "user": {
+                    "id": str(user.id),
+                    "email": user.email
+                }
+            }
+        )
 
