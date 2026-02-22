@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }) => {
         // Set up interval to ping backend every 30 seconds
         const healthCheckInterval = setInterval(() => {
             healthCheck();
-        }, 30000); // 30 seconds
+        }, 86400000); // 30 seconds
 
         // Cleanup interval on unmount
         return () => {
