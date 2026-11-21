@@ -73,7 +73,7 @@ postgrest==2.24.0
 propcache==0.3.1
 proto-plus==1.26.1
 protobuf==5.29.4
-psycopg2==2.9.11
+psycopg2-binary
 py_rust_stemmers==0.1.5
 pyasn1==0.4.8
 pyasn1_modules==0.4.1
