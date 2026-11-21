@@ -14,9 +14,9 @@ python-multipart==0.0.20
 openai==1.75.0
 pypdf==5.4.0
 requests
-protobuf>=5.26,<6
 qdrant-client>=1.19
-langchain-community==0.3.21
-langchain-text-splitters==0.3.8
-langchain-google-genai==2.1.3
-langchain-qdrant==1.1.0
+langchain-core
+langchain-community
+langchain-text-splitters
+langchain-qdrant
+langchain-google-genai
