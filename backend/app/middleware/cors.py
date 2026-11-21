@@ -14,6 +14,7 @@ origins = [
 
     # Google AI Studio Preview - Production
     "https://ais-pre-e6n35rkez3ai2657c4gmge-356223220153.asia-east1.run.app",
+    "https://pdfchatassistantfrontend-git-main-hitendra007s-projects.vercel.app"
 ]
 
 def setup_cors(app):
