@@ -5,9 +5,16 @@ import os
 from qdrant_client import QdrantClient
 from qdrant_client.models import PayloadSchemaType
 
-embedder = GoogleGenerativeAIEmbeddings(
-    model="models/text-embedding-004",
-    google_api_key=settings.GEMINI_API_KEY
+class Embedder768(GoogleGenerativeAIEmbeddings):
+    def embed_documents(self, texts, **kwargs):
+        return super().embed_documents(texts, output_dimensionality=768, **kwargs)
+
+    def embed_query(self, text, **kwargs):
+        return super().embed_query(text, output_dimensionality=768, **kwargs)
+
+embedder = Embedder768(
+    model="models/gemini-embedding-001",
+    google_api_key=settings.GEMINI_API_KEY,
 )
 
 VECTOR_COLLECTION_NAME = "chat_pdf"

@@ -1,10 +1,12 @@
-from openai import OpenAI
+from openai import AsyncOpenAI
 from app.core.settings import settings
 
 
-client = OpenAI(
+client = AsyncOpenAI(
     api_key=settings.GEMINI_API_KEY,
-     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+    timeout=30,
+    max_retries=0,  # llm_fallback.py handles failures, so no silent retries
 )
 
 
@@ -36,4 +38,3 @@ Example:
 | 101       | Alice       | Math        |
 We cannot add a new course (e.g., "Science") unless a student is taking it.
 """
-

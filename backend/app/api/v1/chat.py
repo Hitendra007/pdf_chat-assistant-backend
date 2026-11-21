@@ -8,7 +8,8 @@ from sqlalchemy import select
 from uuid import uuid4, UUID
 from typing import Dict
 from app.core.security import verify_token
-from app.services.llm_bot import client, system_prompt
+from app.services.llm_bot import system_prompt
+from app.services.llm_fallback import stream_with_fallback
 import asyncio
 
 router = APIRouter()
@@ -18,26 +19,28 @@ requests_times = []
 RATE_LIMIT = settings.RATE_LIMIT
 TIME_WINDOW = settings.TIME_WINDOW_SECONDS
 
+
 def can_send():
     now = datetime.now()
-    
-    req_count_in_window = [t for t in requests_times if (now-t).total_seconds() < TIME_WINDOW]
-    
+
+    req_count_in_window = [t for t in requests_times if (now - t).total_seconds() < TIME_WINDOW]
+
     if len(req_count_in_window) >= RATE_LIMIT:
         return False
-    
+
     requests_times.append(now)
     return True
 
+
 def is_with_in_time_limits(timestamp):
     return (datetime.now() - timestamp).total_seconds() < TIME_WINDOW
+
 
 async def cleanup_request_times():
     global requests_times
     while True:
         await asyncio.sleep(5)
-        requests_times = list(filter(is_with_in_time_limits,requests_times))
-    
+        requests_times = list(filter(is_with_in_time_limits, requests_times))
 
 
 @router.websocket("/ws/chat/{pdf_id}")
@@ -45,13 +48,13 @@ async def chat_ws(websocket: WebSocket, pdf_id: str):
     await websocket.accept()
     print("🔌WebSocket connected")
 
-    token = websocket.cookies.get('access_token')
-    if not token:
+    auth_token = websocket.cookies.get('access_token')
+    if not auth_token:
         print("No token in cookies → closing")
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 
-    token_data = verify_token(token)
+    token_data = verify_token(auth_token)
     user_id = token_data.get("sub") if token_data else None
     if not user_id:
         print("Invalid token → closing")
@@ -85,7 +88,7 @@ async def chat_ws(websocket: WebSocket, pdf_id: str):
             db.add(chat_session)
             await db.commit()
 
-    chat_history = [{ 'role': 'system', 'content': system_prompt }]
+    chat_history = [{'role': 'system', 'content': system_prompt}]
 
     try:
         while True:
@@ -97,37 +100,36 @@ async def chat_ws(websocket: WebSocket, pdf_id: str):
                 await websocket.send_text("Missing question or PDF hash.")
                 continue
 
-            # Fetch relevant document chunks
-            relevant_data = relevent_chunks(query=question, pdf_id=pdf_hash)
+            # Run blocking retrieval off the event loop
+            relevant_data = await asyncio.to_thread(
+                relevent_chunks, query=question, pdf_id=pdf_hash
+            )
             context = " ".join([doc['text'] for doc in relevant_data])
+
+            if not can_send():
+                await websocket.send_text("As it is free tier,⚠️ Rate limit exceeded: Too many user requests, please wait a minute.")
+                await websocket.send_text("__END__")
+                continue
 
             chat_history.append({
                 'role': 'user',
                 'content': f"{question}\n\nContext:\n{context}"
             })
-            
-            if not can_send():
-                await websocket.send_text("As it is free tier,⚠️ Rate limit exceeded: Too many user requests, please wait a minute.")
-                await websocket.send_text("__END__")
-                continue
-            
-            
-            stream = client.chat.completions.create(
-                model="gemini-2.0-flash",
-                messages=chat_history,
-                stream=True
-            )
 
             full_response = ""
-            for chunk in stream:
-                if chunk.choices and chunk.choices[0].delta.content:
-                    token = chunk.choices[0].delta.content
-                    full_response += token
-                    await websocket.send_text(token)
+            try:
+                async for piece in stream_with_fallback(chat_history):
+                    full_response += piece
+                    await websocket.send_text(piece)
+            except RuntimeError:
+                await websocket.send_text("All AI models are busy right now. Please try again in a minute.")
+                await websocket.send_text("__END__")
+                chat_history.pop()  # remove the unanswered question
+                continue
 
             # Signal end of stream
             await websocket.send_text("__END__")
-            chat_history.append({ 'role': 'assistant', 'content': full_response })
+            chat_history.append({'role': 'assistant', 'content': full_response})
 
             # Persist messages to database
             async with SessionLocal() as db:
