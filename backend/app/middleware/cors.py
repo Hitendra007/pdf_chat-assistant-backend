@@ -1,10 +1,21 @@
+
 from fastapi.middleware.cors import CORSMiddleware
 
 origins = [
-    "http://localhost:5173",   # Vite dev server
-    "https://pdf-chat-assistant-backend-yt67.vercel.app"
-    # add prod URL here later, e.g. "https://myapp.com"
+    # Local development
+    "http://localhost:5173",
+
+    # Existing Vercel frontends
+    "https://pdf-chat-assistant-backend-yt67.vercel.app",
+    "https://pdf-chat-assistant-backend-77q3.vercel.app",
+
+    # Google AI Studio Preview - Development
+    "https://ais-dev-e6n35rkez3ai2657c4gmge-356223220153.asia-east1.run.app",
+
+    # Google AI Studio Preview - Production
+    "https://ais-pre-e6n35rkez3ai2657c4gmge-356223220153.asia-east1.run.app",
 ]
+
 def setup_cors(app):
     app.add_middleware(
         CORSMiddleware,
